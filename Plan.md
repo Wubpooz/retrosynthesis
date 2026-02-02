@@ -8,6 +8,7 @@ Build a hybrid retrosynthesis prediction system combining HierRetro's hierarchic
 ## Phase 1: Environment Setup & Data Preparation
 
 ### 1.1 Development Environment
+Use a virtual environment with the following dependencies:
 ```bash
 # Core dependencies
 pip install torch torchvision torchaudio
