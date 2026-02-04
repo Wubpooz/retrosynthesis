@@ -1,0 +1,87 @@
+# GNN (Uni-Mol+ style) Configuration
+
+model:
+  encoder_type: "gnn"
+  hidden_dim: 256
+  atom_dim: 256
+  pair_dim: 128
+  num_layers: 6
+  num_heads: 8
+  dropout: 0.1
+  
+encoder:
+  atom_features:
+    - atomic_num
+    - formal_charge
+    - chirality
+    - hybridization
+    - num_hs
+    - is_aromatic
+  bond_features:
+    - bond_type
+    - is_conjugated
+    - is_in_ring
+    - stereo
+  
+  attention:
+    type: "pair_bias"
+    use_pair_repr: true
+
+prediction_heads:
+  rc_type:
+    hidden_dims: [256, 128, 2]
+  atom_center:
+    use_attention: true
+  bond_center:
+    use_attention: true
+  action:
+    atom_action_vocab_size: 50  # Will be set from data
+    bond_action_vocab_size: 20   # Will be set from data
+  termination:
+    hidden_dims: [256, 128, 2]
+
+training:
+  batch_size: 32
+  learning_rate: 0.0001
+  weight_decay: 0.00001
+  max_epochs: 100
+  warmup_epochs: 5
+  gradient_clip: 1.0
+  
+  damt_loss:
+    queue_size: 50
+    tau: 1.0
+    initial_weights: [1.0, 1.0, 1.0, 1.0]
+  
+  optimizer: "adamw"
+  scheduler: "cosine"
+  
+  early_stopping:
+    patience: 10
+    metric: "val_accuracy"
+    mode: "max"
+
+data:
+  dataset: "uspto_50k"
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+  max_atoms: 200
+  max_reactions_centers: 7
+  augmentation:
+    atom_mapping_randomization: true
+    rc_permutation: true
+    max_permutations: 24
+
+inference:
+  beam_width: 10
+  max_steps: 5
+  temperature: 1.0
+
+logging:
+  log_dir: "logs"
+  checkpoint_dir: "checkpoints"
+  save_every: 5
+  log_every: 10
+  use_wandb: true
+  project_name: "hierretro_gnn"
